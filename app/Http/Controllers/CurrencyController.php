@@ -7,25 +7,22 @@ use Illuminate\Support\Facades\Http;
 
 class CurrencyController extends Controller
 {
-   
+    public $currencies; 
 
-    public function getValue(Request $request){
-        $currencies=Http::get('http://api.nbp.pl/api/exchangerates/tables/a')->json();
-        $currencyCode=$request->currency;
-        $message=null;
-        if(!empty($currencyCode)){   
-            $currencyRecords=Http::get('http://api.nbp.pl/api/exchangerates/rates/a/'.$currencyCode.'/last/5/?format=json')->json();
-            if(empty($currencyRecords))
-            {
-                $message="Proszę wybrać poprawną walutę!";
-            }
-            else{
-                return view('index')->with('currencyRecords',$currencyRecords)->with('currencies',$currencies[0]["rates"]);
-            }
-            
-        }
+   public function __construct(){
+        $this->currencies=Http::get(config('services.nbp.url'))->json();
         
-        return view('index')->with('currencies',$currencies[0]["rates"])->withErrors($message);
+   }
+    public function index(){
+        return view('index')->with('currencies', $this->currencies[0]["rates"]);
+    } 
+    
+    public function getValue(Request $request){
+        $currencyCode=$request->currency;
+        if(!empty($currencyCode)){   
+            $currencyRecords=Http::get(config('services.nbp.rates').$currencyCode.config('services.nbp.rates_suffix'))->json();
+            return view('index')->with('currencyRecords',$currencyRecords)->with('currencies', $this->currencies[0]["rates"]);
+        }
         
     }
 }

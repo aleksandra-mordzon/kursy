@@ -13,4 +13,5 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('/', 'App\Http\Controllers\CurrencyController@getValue')->name('getValue');
+Route::get('/', 'App\Http\Controllers\CurrencyController@index');
+Route::get('/value', 'App\Http\Controllers\CurrencyController@getValue')->name('getValue');
